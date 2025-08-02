@@ -2,6 +2,7 @@ package org.eventmanager.app.project.security.config;
 
 import org.eventmanager.app.project.security.exceptions.CustomAuthEntryPoint;
 import org.eventmanager.app.project.security.exceptions.ExceptionHandlerFilter;
+import org.eventmanager.app.project.security.jwt.AuthTokenJwtFilter;
 import org.eventmanager.app.project.security.services.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
