@@ -5,6 +5,7 @@ import org.eventmanager.app.project.models.User;
 import org.eventmanager.app.project.payload.request.auth.SignInRequestPayload;
 import org.eventmanager.app.project.payload.request.auth.SignUpRequestPayload;
 import org.eventmanager.app.project.payload.response.auth.SignInResponsePayload;
+import org.eventmanager.app.project.payload.response.auth.UserInfoPayload;
 import org.eventmanager.app.project.repositories.UserRepository;
 import org.eventmanager.app.project.security.jwt.JwtUtils;
 import org.eventmanager.app.project.security.services.UserDetailsImpl;
@@ -51,12 +52,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookieFromUserDetails(userDetails);
 
-        SignInResponsePayload response = new SignInResponsePayload();
-
-        response.setEmail(email);
-        response.setJwtCookieString(jwtCookie.toString());
-
-        return response;
+        return new SignInResponsePayload(email, jwtCookie.toString());
     }
 
     @Override
@@ -78,5 +74,16 @@ public class AuthServiceImpl implements AuthService {
 
         User user = modelMapper.map(payload, User.class);
         userRepository.save(user);
+    }
+
+    @Override
+    public UserInfoPayload getUserInfoByUserDetails(UserDetailsImpl userDetails) {
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookieFromUserDetails(userDetails);
+
+        UUID userId = userDetails.getId();
+        String email = userDetails.getUsername();
+        String token = jwtUtils.getJwtTokenFromCookieString(jwtCookie.toString());
+
+        return new UserInfoPayload(userId, email, token);
     }
 }
