@@ -121,7 +121,7 @@ public class JwtUtils {
         return cookie == null ? null : cookie.getValue();
     }
 
-    public String getJwtTokenFromCookie(String cookieHeader) {
+    public String getJwtTokenFromCookieString(String cookieHeader) {
         if (cookieHeader == null || cookieHeader.isEmpty()) {
             return null;
         }

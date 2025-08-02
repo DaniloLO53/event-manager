@@ -9,12 +9,13 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class UserDetailsImpl implements UserDetails {
-    private @Getter UUID id;
+    private final @Getter UUID id;
     private final String email;
     private @JsonIgnore String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String email, String password) {
+    public UserDetailsImpl(UUID id, String email, String password) {
+        this.id = id;
         this.email = email;
         this.password = password;
     }

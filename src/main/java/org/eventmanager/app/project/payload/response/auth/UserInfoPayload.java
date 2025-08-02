@@ -1,6 +1,9 @@
 package org.eventmanager.app.project.payload.response.auth;
 
-public record SignInResponsePayload (
+import java.util.UUID;
+
+public record UserInfoPayload (
+    UUID id,
     String email,
     String jwtCookieString
 ){}
