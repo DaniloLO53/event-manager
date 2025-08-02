@@ -1,6 +1,7 @@
 package org.eventmanager.app.project.security.config;
 
 import org.eventmanager.app.project.security.exceptions.CustomAuthEntryPoint;
+import org.eventmanager.app.project.security.services.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,9 +28,11 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomAuthEntryPoint customAuthEntryPoint;
+    private final UserDetailsServiceImpl userDetailsService;
 
-    public SecurityConfig(CustomAuthEntryPoint customAuthEntryPoint) {
+    public SecurityConfig(CustomAuthEntryPoint customAuthEntryPoint, UserDetailsServiceImpl userDetailsService) {
         this.customAuthEntryPoint = customAuthEntryPoint;
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -39,7 +42,7 @@ public class SecurityConfig {
         http.headers(h -> h.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
 
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.exceptionHandling(e -> e.authenticationEntryPoint(new));
+        http.exceptionHandling(e -> e.authenticationEntryPoint(customAuthEntryPoint));
 
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers("/api/auth/**").anonymous();
@@ -71,7 +74,7 @@ public class SecurityConfig {
             auth.anyRequest().authenticated();
         });
 
-        http.authenticationProvider(roleAuthenticationProvider);
+        http.authenticationProvider(daoAuthenticationProvider());
 
         http.addFilterBefore(authTokenJwtFilterBean(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(exceptionHandlerFilterBean(), AuthTokenJwtFilter.class);
@@ -80,9 +83,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(Authentication auth) {
-        Object userDetails = auth.getPrincipal();
-
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
     @Bean
