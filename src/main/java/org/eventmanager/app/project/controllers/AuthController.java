@@ -9,6 +9,7 @@ import org.eventmanager.app.project.security.services.UserDetailsImpl;
 import org.eventmanager.app.project.services.auth.AuthService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -43,5 +44,15 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .header(HttpHeaders.SET_COOKIE, response.jwtCookieString())
                 .body(response);
+    }
+
+    @PatchMapping("/signout")
+    public ResponseEntity<?> signOut() {
+        ResponseCookie cleanJwtCookie = authService.getCleanJwtCookie();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cleanJwtCookie.toString())
+                .body(null);
     }
 }

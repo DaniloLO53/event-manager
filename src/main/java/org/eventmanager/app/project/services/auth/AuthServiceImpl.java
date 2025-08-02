@@ -86,4 +86,9 @@ public class AuthServiceImpl implements AuthService {
 
         return new UserInfoPayload(userId, email, token);
     }
+
+    @Override
+    public ResponseCookie getCleanJwtCookie() {
+        return jwtUtils.getCleanJwtCookie();
+    }
 }
