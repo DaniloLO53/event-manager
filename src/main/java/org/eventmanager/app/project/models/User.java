@@ -3,23 +3,27 @@ package org.eventmanager.app.project.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
+import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
+@ToString(exclude = {"createdEvents", "organizedEvents", "purchasedTickets"}) // Evita loops em logs
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
@@ -27,44 +31,54 @@ public class User {
     @EqualsAndHashCode.Include
     private UUID id;
 
-    @NotNull
     @NotBlank
-    @Size(
-            min = 3,
-            max = 50,
-            message = "Field first_name must have between 3 and 50 characters"
-    )
-    @Column(name = "first_name", nullable = false)
+    @Size(max = 50)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @NotNull
     @NotBlank
-    @Size(
-            min = 3,
-            max = 50,
-            message = "Field last_name must have between 3 and 50 characters"
-    )
-    @Column(name = "last_name", nullable = false)
+    @Size(max = 50)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @NotNull
     @NotBlank
     @Email
-    @Size(
-            min = 3,
-            max = 100,
-            message = "Field email must have between 3 and 100 characters"
-    )
-    @Column(name = "email", nullable = false, unique = true)
+    @Size(max = 100)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @NotNull
     @NotBlank
-    @Size(
-            min = 3,
-            max = 255,
-            message = "Field password must have between 3 and 255 characters"
-    )
     @Column(name = "password", nullable = false)
     private String password;
+
+    @NotBlank
+    @Column(name = "role", nullable = false, length = 50)
+    private String role;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    // --- RELACIONAMENTOS ---
+
+    // Um usuário pode ser o CRIADOR de vários eventos.
+    @OneToMany(mappedBy = "creator")
+    private Set<Event> createdEvents;
+
+    // Um usuário (participante) pode ter comprado vários ingressos.
+    @OneToMany(mappedBy = "attendee")
+    private Set<Ticket> purchasedTickets;
+
+    // Um usuário pode ser CO-ORGANIZADOR de vários eventos e um evento pode ter vários co-organizadores (N-N).
+    @ManyToMany
+    @JoinTable(
+        name = "event_organizers",
+        joinColumns = @JoinColumn(name = "user_id"), // Chave estrangeira para esta entidade (User)
+        inverseJoinColumns = @JoinColumn(name = "event_id") // Chave estrangeira para a outra entidade (Event)
+    )
+    private Set<Event> organizedEvents;
 }
