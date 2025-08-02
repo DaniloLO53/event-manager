@@ -84,14 +84,14 @@ public class JwtUtils {
                 .header()
                 .keyId(jwtKeyId)
                 .and()
-                .subject(payload.getEmail())
+                .subject(payload.email())
                 .issuer(jwtIssuer) // (Opcional) Quem emitiu o token
                 .issuedAt(now) // Data de emissão
                 .audience().add(jwtAudience)
                 .and()
                 .expiration(expirationDate)
 
-                .claim("id", payload.getId())
+                .claim("id", payload.id())
 
                 .signWith(jwtKey)
 
