@@ -1,21 +1,39 @@
 package org.eventmanager.app.project.security.services;
 
-import org.eventmanager.app.project.repositories.UserRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
-@Service
-public class UserDetailsImpl implements UserDetailsService {
-    private UserRepository userRepository;
+import java.util.Collection;
 
-    public UserDetailsImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+public class UserDetailsImpl implements UserDetails {
+    private final String email;
+    private final @JsonIgnore String password;
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public UserDetailsImpl(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public UserDetailsImpl(String email, String password, Collection<? extends GrantedAuthority> authorities) {
+        this.email = email;
+        this.password = password;
+        this.authorities = authorities;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        userRepository.findFirstByEmail(email).orElseThrow(() -> ne);
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 }
