@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS events (
     start_time TIMESTAMPTZ NOT NULL,
     duration_minutes INTEGER NOT NULL,
     creator_user_id UUID,
+    -- agora possui um room_id
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
