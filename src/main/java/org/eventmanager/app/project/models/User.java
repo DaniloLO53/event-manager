@@ -5,12 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
-import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -50,18 +47,6 @@ public class User {
     @NotBlank
     @Column(name = "password", nullable = false)
     private String password;
-
-    @NotBlank
-    @Column(name = "role", nullable = false, length = 50)
-    private String role;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
 
     // --- RELACIONAMENTOS ---
 

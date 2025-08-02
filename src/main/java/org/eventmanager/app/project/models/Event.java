@@ -54,4 +54,9 @@ public class Event {
     @JoinColumn(name = "creator_user_id", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User creator;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", referencedColumnName = "id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private Room room;
 }
