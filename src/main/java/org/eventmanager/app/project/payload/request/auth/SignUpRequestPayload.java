@@ -1,4 +1,4 @@
-package org.eventmanager.app.project.payload.request;
+package org.eventmanager.app.project.payload.request.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +18,7 @@ public class SignUpRequestPayload {
     private String email;
 
     @NotBlank(message = "A senha не pode estar em branco.")
-    @Size(min = 8, max = 255, message = "A senha deve ter entre 8 e 255 caracteres.")
+    @Size(min = 3, max = 255, message = "A senha deve ter entre 3 e 255 caracteres.")
     private String password;
 
     @NotBlank(message = "A confirmação da senha não pode estar em branco.")
