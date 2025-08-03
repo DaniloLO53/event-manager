@@ -57,13 +57,4 @@ public class User {
     // Um usuário (participante) pode ter comprado vários ingressos.
     @OneToMany(mappedBy = "attendee")
     private Set<Ticket> purchasedTickets;
-
-    // Um usuário pode ser CO-ORGANIZADOR de vários eventos e um evento pode ter vários co-organizadores (N-N).
-    @ManyToMany
-    @JoinTable(
-        name = "event_organizers",
-        joinColumns = @JoinColumn(name = "user_id"), // Chave estrangeira para esta entidade (User)
-        inverseJoinColumns = @JoinColumn(name = "event_id") // Chave estrangeira para a outra entidade (Event)
-    )
-    private Set<Event> organizedEvents;
 }

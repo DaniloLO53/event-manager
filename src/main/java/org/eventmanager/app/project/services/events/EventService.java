@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface EventService {
     CreateEventResponsePayload createEvent(UUID userId, @Valid CreateEventRequestPayload payload);
+    CreateEventResponsePayload updateEvent(UUID userId, UUID eventId, @Valid CreateEventRequestPayload payload);
 }
