@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -54,6 +55,14 @@ public class Event {
     @JoinColumn(name = "creator_user_id", referencedColumnName = "id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User creator;
+
+    @ManyToMany
+    @JoinTable(
+        name = "event_organizers",
+        joinColumns = @JoinColumn(name = "event_id"), // Chave estrangeira para esta entidade (User)
+        inverseJoinColumns = @JoinColumn(name = "user_id") // Chave estrangeira para a outra entidade (Event)
+    )
+    private Set<User> organizers;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", referencedColumnName = "id")

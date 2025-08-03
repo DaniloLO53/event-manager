@@ -25,4 +25,31 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
         @Param("startTime") Instant startTime,
         @Param("endTime") Instant endTime
     );
+
+    @Query(
+        value = "SELECT EXISTS (" +
+                "  SELECT 1 FROM events e " +
+                "  WHERE e.room_id = :roomId " +
+                "    AND e.id <> :eventId " + // <-- A CONDIÇÃO CHAVE
+                "    AND e.start_time < :endTime " +
+                "    AND (:startTime < e.start_time + e.duration_minutes * INTERVAL '1 minute')" +
+                ")",
+        nativeQuery = true
+    )
+    boolean existsOverlappingEventInRoomExcludingId(
+        @Param("roomId") UUID roomId,
+        @Param("eventId") UUID eventId,
+        @Param("startTime") Instant startTime,
+        @Param("endTime") Instant endTime
+    );
+
+    @Query(
+        nativeQuery = true,
+        value = "SELECT EXISTS (" +
+                "  SELECT 1 FROM events e WHERE e.id = :eventId AND e.creator_user_id = :userId " +
+                "  UNION ALL " +
+                "  SELECT 1 FROM event_organizers eo WHERE eo.event_id = :eventId AND eo.user_id = :userId" +
+                ")"
+    )
+    boolean isUserCreatorOrOrganizer(@Param("eventId") UUID eventId, @Param("userId") UUID userId);
 }

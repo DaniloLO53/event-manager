@@ -53,9 +53,47 @@ public class EventServiceImpl implements EventService {
 
         Event event = modelMapper.map(payload, Event.class);
         // Por algum motivo o modelMapper nao esta convertendo o startTime
-        if (payload.getStartTime() != null) {
-            event.setStartTime(payload.getStartTime().toInstant());
+        event.setStartTime(payload.getStartTime().toInstant());
+        event.setCreator(author);
+        event.setRoom(room);
+
+        Event savedEvent = eventRepository.save(event);
+
+        CreateEventResponsePayload savedPayload = modelMapper.map(savedEvent, CreateEventResponsePayload.class);
+        savedPayload.setStartTime(payload.getStartTime());
+
+        return savedPayload;
+    }
+
+    @Override
+    public CreateEventResponsePayload updateEvent(UUID userId, UUID eventId, CreateEventRequestPayload payload) {
+        if (!eventRepository.isUserCreatorOrOrganizer(eventId, userId)) {
+            throw new ConflictException("Apenas organizadores do evento podem modificá-lo.");
         }
+
+        User author = userRepository.findFirstById(userId);
+        Event event = eventRepository
+                .findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Evento", "id", eventId.toString()));
+
+        UUID roomId = payload.getRoomId();
+        Room room = roomRepository
+                .findFirstById(roomId).orElseThrow(() -> new ResourceNotFoundException("Sala", "id", roomId.toString()));
+
+        if (room.getStatus() != RoomStatus.AVAILABLE) {
+            throw new ConflictException("A sala '" + room.getName() + "' não está disponível para agendamentos.");
+        }
+
+        Instant startTime = payload.getStartTime().toInstant();
+        Instant endTime = startTime.plus(payload.getDurationMinutes(), ChronoUnit.MINUTES);
+        if (eventRepository.existsOverlappingEventInRoomExcludingId(roomId, eventId, startTime, endTime)) {
+            throw new ConflictException("O novo horário sobrepõe outro evento existente na sala.");
+        }
+
+        event.setTitle(payload.getTitle());
+        event.setDescription(payload.getDescription());
+        // Por algum motivo o modelMapper nao esta convertendo o startTime
+        event.setStartTime(payload.getStartTime().toInstant());
+        event.setDurationMinutes(payload.getDurationMinutes());
         event.setCreator(author);
         event.setRoom(room);
 
